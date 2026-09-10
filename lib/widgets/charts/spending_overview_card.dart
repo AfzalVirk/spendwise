@@ -41,12 +41,10 @@ class _SpendingOverviewCardState extends State<SpendingOverviewCard> {
     final isWeek = _range == ChartRange.week;
     final values =
         isWeek ? provider.weeklyChartData() : provider.monthlyChartData();
-    final labels = isWeek
-        ? _weekLabels
-        : [for (var i = 1; i <= values.length; i++) 'W$i'];
+    final labels =
+        isWeek ? _weekLabels : [for (var i = 1; i <= values.length; i++) 'W$i'];
     final total = isWeek ? provider.weekTotal : provider.monthTotal;
-    final maxValue =
-        values.fold<double>(0, (max, v) => v > max ? v : max);
+    final maxValue = values.fold<double>(0, (max, v) => v > max ? v : max);
     final hasData = maxValue > 0;
 
     // Index highlighted in solid black: today's weekday or current week.
@@ -65,8 +63,7 @@ class _SpendingOverviewCardState extends State<SpendingOverviewCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Spending Overview',
-                        style: AppTextStyles.sectionTitle),
+                    Text('Spending Overview', style: AppTextStyles.bodyMedium),
                     const SizedBox(height: 4),
                     Text(
                       '${Formatters.money(total, currency)} '
@@ -192,8 +189,7 @@ class _AnimatedBars extends StatelessWidget {
                 getTooltipItem: (group, groupIndex, rod, rodIndex) {
                   return BarTooltipItem(
                     Formatters.money(values[group.x], currency),
-                    AppTextStyles.caption
-                        .copyWith(color: AppColors.onPrimary),
+                    AppTextStyles.caption.copyWith(color: AppColors.onPrimary),
                   );
                 },
               ),
