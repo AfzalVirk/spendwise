@@ -1,0 +1,51 @@
+name: spendwise
+description: "SpendWise - a simple offline personal expense tracker."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.1.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  fl_chart: ^0.69.2
+  intl: ^0.20.2
+  lottie: ^3.1.3
+  file_picker: ^8.1.4
+  path_provider: ^2.1.5
+  flutter_svg: ^2.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/animations/logoanimation.json
+    - assets/icon/logo.svg
+
+  # Font files are not bundled yet. When the Open Sauce / Peace Sans files are
+  # added under assets/fonts/, uncomment this section (the family names must
+  # stay 'OpenSauce' and 'PeaceSans' to match lib/core/theme/app_fonts.dart).
+  # Until then the app falls back to the default system font automatically.
+  #
+  fonts:
+    - family: OpenSauce
+      fonts:
+        - asset: assets/fonts/OpenSauceOne-Regular.ttf
+        - asset: assets/fonts/OpenSauceOne-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/OpenSauceOne-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/OpenSauceOne-Bold.ttf
+          weight: 700
+    - family: PeaceSans
+      fonts:
+        - asset: assets/fonts/PeaceSans-Regular.ttf
