@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme/app_colors.dart';
@@ -28,11 +29,13 @@ class HomeHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               alignment: Alignment.center,
-              child: Text(
-                'S',
-                style: AppTextStyles.title.copyWith(
-                  color: AppColors.onPrimary,
-                  fontSize: 18,
+              child: SvgPicture.asset(
+                'assets/icon/logo.svg',
+                width: 27,
+                height: 27,
+                colorFilter: const ColorFilter.mode(
+                  AppColors.onPrimary,
+                  BlendMode.srcIn,
                 ),
               ),
             ),
