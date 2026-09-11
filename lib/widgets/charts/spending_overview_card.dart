@@ -63,7 +63,8 @@ class _SpendingOverviewCardState extends State<SpendingOverviewCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Spending Overview', style: AppTextStyles.bodyMedium),
+                    const Text('Spending Overview',
+                        style: AppTextStyles.bodyMedium),
                     const SizedBox(height: 4),
                     Text(
                       '${Formatters.money(total, currency)} '
