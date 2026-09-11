@@ -77,8 +77,7 @@ class SettingsScreen extends StatelessWidget {
                         ? AppColors.subtleFill
                         : AppColors.surface,
                     side: const BorderSide(color: AppColors.border),
-                    onPressed: () =>
-                        Navigator.of(dialogContext).pop(currency),
+                    onPressed: () => Navigator.of(dialogContext).pop(currency),
                   ),
               ],
             ),
@@ -99,8 +98,7 @@ class SettingsScreen extends StatelessWidget {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () =>
-                Navigator.of(dialogContext).pop(controller.text),
+            onPressed: () => Navigator.of(dialogContext).pop(controller.text),
             child: const Text('Save'),
           ),
         ],
@@ -172,7 +170,7 @@ class SettingsScreen extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
         children: [
-          Text('Settings', style: AppTextStyles.heading),
+          const Text('Settings', style: AppTextStyles.heading),
           const SizedBox(height: 20),
           Text('PROFILE', style: _sectionLabel),
           const SizedBox(height: 8),
@@ -190,8 +188,8 @@ class SettingsScreen extends StatelessWidget {
                 _SettingsTile(
                   icon: Icons.track_changes_outlined,
                   title: 'Daily Target',
-                  value: Formatters.money(
-                      settings.dailyTarget, settings.currency),
+                  value:
+                      Formatters.money(settings.dailyTarget, settings.currency),
                   onTap: () => _editTarget(context),
                 ),
                 const Divider(height: 1, indent: 56),
@@ -228,7 +226,7 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 28),
-          Center(
+          const Center(
             child: Text(
               'SpendWise · Offline expense tracker',
               style: AppTextStyles.caption,

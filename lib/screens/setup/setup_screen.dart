@@ -80,8 +80,8 @@ class _SetupScreenState extends State<SetupScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              FadeSlideIn(
-                delay: const Duration(milliseconds: 140),
+              const FadeSlideIn(
+                delay: Duration(milliseconds: 140),
                 child: Text(
                   'Just a name — no accounts, no sign-up.',
                   style: AppTextStyles.bodySecondary,

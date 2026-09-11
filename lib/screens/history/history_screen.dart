@@ -61,7 +61,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('History', style: AppTextStyles.heading),
+                const Text('History', style: AppTextStyles.heading),
                 const SizedBox(height: 4),
                 Text(
                   '${filtered.length} expense${filtered.length == 1 ? '' : 's'}'
@@ -122,8 +122,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           currency: currency,
                           onTap: () => Navigator.of(context).push(
                             SlideUpRoute(
-                              page:
-                                  AddExpenseScreen(existing: row.expense),
+                              page: AddExpenseScreen(existing: row.expense),
                             ),
                           ),
                         );

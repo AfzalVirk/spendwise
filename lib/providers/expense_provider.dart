@@ -102,9 +102,7 @@ class ExpenseProvider extends ChangeNotifier {
       case HistoryFilter.all:
         return _expenses;
       case HistoryFilter.today:
-        return _expenses
-            .where((e) => DateUtilsX.isToday(e.dateTime))
-            .toList();
+        return _expenses.where((e) => DateUtilsX.isToday(e.dateTime)).toList();
       case HistoryFilter.week:
         return _expenses
             .where((e) => DateUtilsX.isInCurrentWeek(e.dateTime))

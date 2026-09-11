@@ -200,7 +200,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     },
                   ),
                   const SizedBox(height: 24),
-                  Text('Category', style: AppTextStyles.label),
+                  const Text('Category', style: AppTextStyles.label),
                   const SizedBox(height: 10),
                   CategoryGrid(
                     selected: _category,
@@ -208,7 +208,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                         setState(() => _category = category),
                   ),
                   const SizedBox(height: 24),
-                  Text('Date & Time', style: AppTextStyles.label),
+                  const Text('Date & Time', style: AppTextStyles.label),
                   const SizedBox(height: 10),
                   Row(
                     children: [
@@ -230,7 +230,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  Text('Note (optional)', style: AppTextStyles.label),
+                  const Text('Note (optional)', style: AppTextStyles.label),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _noteController,

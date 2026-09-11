@@ -3,7 +3,6 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/app_page_route.dart';
 import '../../providers/settings_provider.dart';
 import '../main/main_shell.dart';

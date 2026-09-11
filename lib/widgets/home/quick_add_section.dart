@@ -27,7 +27,7 @@ class QuickAddSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Quick Add', style: AppTextStyles.bodyMedium),
+        const Text('Quick Add', style: AppTextStyles.bodyMedium),
         const SizedBox(height: 12),
         Row(
           children: [

@@ -40,7 +40,7 @@ class HomeHeader extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            Text('SpendWise', style: AppTextStyles.amount),
+            const Text('SpendWise', style: AppTextStyles.amount),
           ],
         ),
         const SizedBox(height: 22),

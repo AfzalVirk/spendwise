@@ -35,7 +35,7 @@ class TargetCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Today's Target", style: AppTextStyles.label),
+              const Text("Today's Target", style: AppTextStyles.label),
               if (isOver)
                 Container(
                   padding:
@@ -81,9 +81,8 @@ class TargetCard extends StatelessWidget {
                     value: remaining.abs(),
                     currency: currency,
                     style: AppTextStyles.amount.copyWith(
-                      color: isOver
-                          ? AppColors.overBudget
-                          : AppColors.primaryText,
+                      color:
+                          isOver ? AppColors.overBudget : AppColors.primaryText,
                     ),
                   ),
                 ),
