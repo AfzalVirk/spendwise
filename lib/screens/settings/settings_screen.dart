@@ -55,6 +55,28 @@ class SettingsScreen extends StatelessWidget {
     await settings.setDailyTarget(target);
   }
 
+  Future<void> _editMonthlyBudget(BuildContext context) async {
+    final settings = context.read<SettingsProvider>();
+    final current = settings.currentMonthBudget;
+    final value = await _promptText(
+      context,
+      title: 'Monthly budget',
+      initial: current > 0 ? Formatters.number(current) : '',
+      hint: '35000',
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))],
+    );
+    if (value == null) return;
+    final budget = double.tryParse(value.replaceAll(',', ''));
+    if (budget == null || budget <= 0) {
+      if (context.mounted) {
+        _showSnack(context, 'Please enter a valid budget amount');
+      }
+      return;
+    }
+    await settings.setCurrentMonthBudget(budget);
+  }
+
   Future<void> _editCurrency(BuildContext context) async {
     final settings = context.read<SettingsProvider>();
     final controller = TextEditingController(text: settings.currency);
@@ -191,6 +213,16 @@ class SettingsScreen extends StatelessWidget {
                   value:
                       Formatters.money(settings.dailyTarget, settings.currency),
                   onTap: () => _editTarget(context),
+                ),
+                const Divider(height: 1, indent: 56),
+                _SettingsTile(
+                  icon: Icons.calendar_month_outlined,
+                  title: 'Monthly Budget',
+                  value: settings.currentMonthBudget > 0
+                      ? Formatters.money(
+                          settings.currentMonthBudget, settings.currency)
+                      : 'Not set',
+                  onTap: () => _editMonthlyBudget(context),
                 ),
                 const Divider(height: 1, indent: 56),
                 _SettingsTile(

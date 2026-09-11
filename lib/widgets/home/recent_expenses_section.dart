@@ -28,7 +28,7 @@ class RecentExpensesSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Recent Expenses', style: AppTextStyles.sectionTitle),
+            const Text('Recent Expenses', style: AppTextStyles.bodyMedium),
             if (recent.isNotEmpty)
               TextButton(
                 onPressed: onViewAll,

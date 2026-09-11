@@ -21,6 +21,17 @@ class SettingsProvider extends ChangeNotifier {
   String get currency => _currency;
   bool get setupComplete => _setupComplete;
 
+  /// Returns the monthly budget for the given year/month.
+  /// Returns 0 if none has been set for that month.
+  double getMonthlyBudget(int year, int month) =>
+      StorageService.getMonthlyBudget(year, month);
+
+  /// Convenience getter for the current calendar month's budget.
+  double get currentMonthBudget {
+    final now = DateTime.now();
+    return StorageService.getMonthlyBudget(now.year, now.month);
+  }
+
   Future<void> setName(String value) async {
     _name = value.trim();
     await StorageService.setName(_name);
@@ -36,6 +47,13 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setCurrency(String value) async {
     _currency = value.trim();
     await StorageService.setCurrency(_currency);
+    notifyListeners();
+  }
+
+  /// Sets the monthly budget for the current calendar month only.
+  Future<void> setCurrentMonthBudget(double value) async {
+    final now = DateTime.now();
+    await StorageService.setMonthlyBudget(now.year, now.month, value);
     notifyListeners();
   }
 
@@ -65,3 +83,4 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
+

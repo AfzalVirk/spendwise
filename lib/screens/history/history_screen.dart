@@ -13,7 +13,7 @@ import '../../widgets/common/fade_slide_in.dart';
 import '../../widgets/expense/expense_tile.dart';
 import '../add_expense/add_expense_screen.dart';
 
-/// Continuous scrollable history grouped by date, with simple filters.
+/// Continuous scrollable history grouped by date, with date filters.
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
 
@@ -22,21 +22,51 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  HistoryFilter _filter = HistoryFilter.month;
+  HistoryFilter _filter = HistoryFilter.today;
+
+  /// Only set when the user has picked a specific date.
+  DateTime? _pickedDate;
 
   static const _filters = [
     (filter: HistoryFilter.today, label: 'Today'),
-    (filter: HistoryFilter.week, label: 'This Week'),
-    (filter: HistoryFilter.month, label: 'This Month'),
-    (filter: HistoryFilter.all, label: 'All'),
+    (filter: HistoryFilter.yesterday, label: 'Yesterday'),
+    (filter: HistoryFilter.pickDate, label: 'Pick Date'),
   ];
+
+  Future<void> _onPickDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _pickedDate ?? now,
+      firstDate: DateTime(now.year - 5),
+      lastDate: now,
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: AppColors.primary,
+            onPrimary: AppColors.onPrimary,
+            surface: AppColors.surface,
+          ),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked == null) return;
+    setState(() {
+      _filter = HistoryFilter.pickDate;
+      _pickedDate = picked;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ExpenseProvider>();
     final currency = context.watch<SettingsProvider>().currency;
 
-    final filtered = provider.expensesForFilter(_filter);
+    final filtered = provider.expensesForFilter(
+      _filter,
+      pickedDate: _pickedDate,
+    );
     final grouped = provider.groupByDate(filtered);
     final total = filtered.fold<double>(0, (sum, e) => sum + e.amount);
 
@@ -52,6 +82,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
       }
     });
 
+    // Subtitle shown below the heading, describing what's being shown.
+    final String subtitle;
+    if (_filter == HistoryFilter.pickDate && _pickedDate != null) {
+      subtitle = '${filtered.length} expense${filtered.length == 1 ? '' : 's'}'
+          ' · ${Formatters.money(total, currency)}'
+          ' · ${Formatters.friendlyDate(_pickedDate!)}';
+    } else {
+      subtitle = '${filtered.length} expense${filtered.length == 1 ? '' : 's'}'
+          ' · ${Formatters.money(total, currency)}';
+    }
+
     return SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,11 +104,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               children: [
                 const Text('History', style: AppTextStyles.heading),
                 const SizedBox(height: 4),
-                Text(
-                  '${filtered.length} expense${filtered.length == 1 ? '' : 's'}'
-                  ' · ${Formatters.money(total, currency)}',
-                  style: AppTextStyles.bodySecondary,
-                ),
+                Text(subtitle, style: AppTextStyles.bodySecondary),
               ],
             ),
           ),
@@ -84,7 +121,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     child: _FilterChip(
                       label: item.label,
                       selected: _filter == item.filter,
-                      onTap: () => setState(() => _filter = item.filter),
+                      onTap: () {
+                        if (item.filter == HistoryFilter.pickDate) {
+                          _onPickDate();
+                        } else {
+                          setState(() {
+                            _filter = item.filter;
+                            _pickedDate = null;
+                          });
+                        }
+                      },
                     ),
                   ),
               ],
@@ -96,15 +142,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
               duration: const Duration(milliseconds: 220),
               child: rows.isEmpty
                   ? EmptyState(
-                      key: ValueKey('empty-$_filter'),
+                      key: ValueKey('empty-$_filter-$_pickedDate'),
                       title: 'Nothing here yet',
-                      message: _filter == HistoryFilter.all
-                          ? 'Add your first expense and start tracking '
-                              'your spending.'
+                      message: _filter == HistoryFilter.pickDate
+                          ? 'No expenses recorded for the selected date.'
                           : 'No expenses recorded for this period.',
                     )
                   : ListView.builder(
-                      key: ValueKey(_filter),
+                      key: ValueKey('$_filter-$_pickedDate'),
                       padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
                       itemCount: rows.length,
                       itemBuilder: (context, index) {
@@ -122,7 +167,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           currency: currency,
                           onTap: () => Navigator.of(context).push(
                             SlideUpRoute(
-                              page: AddExpenseScreen(existing: row.expense),
+                              page:
+                                  AddExpenseScreen(existing: row.expense),
                             ),
                           ),
                         );

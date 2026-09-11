@@ -1,4 +1,3 @@
-import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
@@ -7,7 +6,7 @@ import '../core/utils/formatters.dart';
 import '../models/expense.dart';
 import '../services/hive_service.dart';
 
-enum HistoryFilter { all, today, week, month }
+enum HistoryFilter { today, yesterday, pickDate }
 
 /// Manages all expense data and derived totals.
 class ExpenseProvider extends ChangeNotifier {
@@ -77,6 +76,13 @@ class ExpenseProvider extends ChangeNotifier {
   double get todayTotal =>
       _sum(_expenses.where((e) => DateUtilsX.isToday(e.dateTime)));
 
+  double get yesterdayTotal {
+    final yesterday = DateTime.now().subtract(const Duration(days: 1));
+    return _sum(
+      _expenses.where((e) => DateUtilsX.isSameDay(e.dateTime, yesterday)),
+    );
+  }
+
   double get weekTotal =>
       _sum(_expenses.where((e) => DateUtilsX.isInCurrentWeek(e.dateTime)));
 
@@ -92,31 +98,57 @@ class ExpenseProvider extends ChangeNotifier {
 
   bool isOverTarget(double dailyTarget) => todayTotal > dailyTarget;
 
+  // --------------------------------------------------------- Monthly budget helpers
+
+  /// Remaining from the monthly budget; negative means over budget.
+  double remainingThisMonth(double monthlyBudget) =>
+      monthlyBudget - monthTotal;
+
+  /// Fraction of the monthly budget spent (may exceed 1.0).
+  double progressThisMonth(double monthlyBudget) =>
+      monthlyBudget <= 0 ? 0 : monthTotal / monthlyBudget;
+
+  bool isOverMonthlyBudget(double monthlyBudget) =>
+      monthTotal > monthlyBudget;
+
   // ------------------------------------------------------------- Queries
 
   List<Expense> recentExpenses([int count = 4]) =>
       _expenses.take(count).toList();
 
-  List<Expense> expensesForFilter(HistoryFilter filter) {
+  /// Returns expenses filtered by the given [HistoryFilter].
+  /// [pickedDate] is required when filter is [HistoryFilter.pickDate].
+  List<Expense> expensesForFilter(
+    HistoryFilter filter, {
+    DateTime? pickedDate,
+  }) {
     switch (filter) {
-      case HistoryFilter.all:
-        return _expenses;
       case HistoryFilter.today:
-        return _expenses.where((e) => DateUtilsX.isToday(e.dateTime)).toList();
-      case HistoryFilter.week:
         return _expenses
-            .where((e) => DateUtilsX.isInCurrentWeek(e.dateTime))
+            .where((e) => DateUtilsX.isToday(e.dateTime))
             .toList();
-      case HistoryFilter.month:
+      case HistoryFilter.yesterday:
+        final yesterday = DateTime.now().subtract(const Duration(days: 1));
         return _expenses
-            .where((e) => DateUtilsX.isInCurrentMonth(e.dateTime))
+            .where((e) => DateUtilsX.isSameDay(e.dateTime, yesterday))
+            .toList();
+      case HistoryFilter.pickDate:
+        if (pickedDate == null) return [];
+        return _expenses
+            .where((e) => DateUtilsX.isSameDay(e.dateTime, pickedDate))
             .toList();
     }
   }
 
+  /// Returns all expenses for a specific calendar day.
+  List<Expense> expensesForDate(DateTime date) =>
+      _expenses
+          .where((e) => DateUtilsX.isSameDay(e.dateTime, date))
+          .toList();
+
   /// Groups a (newest-first) list by calendar day, preserving order.
-  LinkedHashMap<DateTime, List<Expense>> groupByDate(List<Expense> items) {
-    final map = LinkedHashMap<DateTime, List<Expense>>();
+  Map<DateTime, List<Expense>> groupByDate(List<Expense> items) {
+    final map = <DateTime, List<Expense>>{};
     for (final e in items) {
       final day = DateUtilsX.dayOf(e.dateTime);
       map.putIfAbsent(day, () => []).add(e);
@@ -156,3 +188,4 @@ class ExpenseProvider extends ChangeNotifier {
     return totals;
   }
 }
+

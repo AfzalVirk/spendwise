@@ -38,4 +38,23 @@ class StorageService {
 
   static Future<void> setSetupComplete(bool value) =>
       HiveService.settingsBox.put(_keySetupComplete, value);
+
+  // --------------------------------------------------------- Monthly budget
+
+  /// Returns the key used to store a specific month's budget.
+  /// Example: "monthlyBudget_2026_9" for September 2026.
+  static String _monthlyBudgetKey(int year, int month) =>
+      'monthlyBudget_${year}_$month';
+
+  /// Returns the monthly budget for the given year/month,
+  /// or 0 if none has been set for that month yet.
+  static double getMonthlyBudget(int year, int month) {
+    final raw = HiveService.settingsBox
+        .get(_monthlyBudgetKey(year, month), defaultValue: 0.0);
+    return (raw as num).toDouble();
+  }
+
+  /// Saves the monthly budget specifically for the given year/month.
+  static Future<void> setMonthlyBudget(int year, int month, double value) =>
+      HiveService.settingsBox.put(_monthlyBudgetKey(year, month), value);
 }
