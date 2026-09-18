@@ -151,17 +151,25 @@ class _TodayView extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        const Divider(height: 1, color: AppColors.divider),
+        const Center(
+          child: SizedBox(
+            width: 64,
+            child: Divider(height: 1, color: AppColors.chartBar),
+          ),
+        ),
         const SizedBox(height: 10),
         // Motivational / state-aware insight line.
-        Text(
-          BudgetInsight.todayInsight(
-            progress: progress,
-            remaining: remaining,
-            currency: currency,
-          ),
-          style: AppTextStyles.caption.copyWith(
-            color: isOver ? AppColors.overBudget : AppColors.secondaryText,
+        Center(
+          child: Text(
+            BudgetInsight.todayInsight(
+              progress: progress,
+              remaining: remaining,
+              currency: currency,
+            ),
+            textAlign: TextAlign.center,
+            style: AppTextStyles.caption.copyWith(
+              color: isOver ? AppColors.overBudget : AppColors.secondaryText,
+            ),
           ),
         ),
       ],
@@ -272,19 +280,27 @@ class _MonthView extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        const Divider(height: 1, color: AppColors.divider),
+        const Center(
+          child: SizedBox(
+            width: 64,
+            child: Divider(height: 1, color: AppColors.chartBar),
+          ),
+        ),
         const SizedBox(height: 10),
         // Actionable monthly insight (daily-rate or motivational).
-        Text(
-          BudgetInsight.monthInsight(
-            progress: progress,
-            remaining: remaining,
-            daysLeft: daysLeft,
-            currency: currency,
-            hasBudget: budget > 0,
-          ),
-          style: AppTextStyles.caption.copyWith(
-            color: isOver ? AppColors.overBudget : AppColors.secondaryText,
+        Center(
+          child: Text(
+            BudgetInsight.monthInsight(
+              progress: progress,
+              remaining: remaining,
+              daysLeft: daysLeft,
+              currency: currency,
+              hasBudget: budget > 0,
+            ),
+            textAlign: TextAlign.center,
+            style: AppTextStyles.caption.copyWith(
+              color: isOver ? AppColors.overBudget : AppColors.secondaryText,
+            ),
           ),
         ),
       ],
