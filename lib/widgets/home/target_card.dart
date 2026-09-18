@@ -159,17 +159,14 @@ class _TodayView extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         // Motivational / state-aware insight line.
-        Center(
-          child: Text(
-            BudgetInsight.todayInsight(
-              progress: progress,
-              remaining: remaining,
-              currency: currency,
-            ),
-            textAlign: TextAlign.center,
-            style: AppTextStyles.caption.copyWith(
-              color: isOver ? AppColors.overBudget : AppColors.secondaryText,
-            ),
+        Text(
+          BudgetInsight.todayInsight(
+            progress: progress,
+            remaining: remaining,
+            currency: currency,
+          ),
+          style: AppTextStyles.caption.copyWith(
+            color: isOver ? AppColors.overBudget : AppColors.secondaryText,
           ),
         ),
       ],
@@ -288,19 +285,16 @@ class _MonthView extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         // Actionable monthly insight (daily-rate or motivational).
-        Center(
-          child: Text(
-            BudgetInsight.monthInsight(
-              progress: progress,
-              remaining: remaining,
-              daysLeft: daysLeft,
-              currency: currency,
-              hasBudget: budget > 0,
-            ),
-            textAlign: TextAlign.center,
-            style: AppTextStyles.caption.copyWith(
-              color: isOver ? AppColors.overBudget : AppColors.secondaryText,
-            ),
+        Text(
+          BudgetInsight.monthInsight(
+            progress: progress,
+            remaining: remaining,
+            daysLeft: daysLeft,
+            currency: currency,
+            hasBudget: budget > 0,
+          ),
+          style: AppTextStyles.caption.copyWith(
+            color: isOver ? AppColors.overBudget : AppColors.secondaryText,
           ),
         ),
       ],
