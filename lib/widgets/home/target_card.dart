@@ -150,7 +150,9 @@ class _TodayView extends StatelessWidget {
             color: isOver ? AppColors.overBudget : AppColors.secondaryText,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 12),
+        const Divider(height: 1, color: AppColors.divider),
+        const SizedBox(height: 10),
         // Motivational / state-aware insight line.
         Text(
           BudgetInsight.todayInsight(
@@ -269,7 +271,9 @@ class _MonthView extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 12),
+        const Divider(height: 1, color: AppColors.divider),
+        const SizedBox(height: 10),
         // Actionable monthly insight (daily-rate or motivational).
         Text(
           BudgetInsight.monthInsight(
