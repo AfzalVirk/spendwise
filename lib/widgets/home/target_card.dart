@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/utils/budget_insight.dart';
 import '../../core/utils/formatters.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/settings_provider.dart';
@@ -140,10 +141,23 @@ class _TodayView extends StatelessWidget {
         const SizedBox(height: 20),
         _ProgressBar(clamped: clamped, isOver: isOver),
         const SizedBox(height: 8),
+        // Bottom row: percent on the left (or over-amount when over target).
         Text(
           isOver
               ? '${Formatters.money(remaining.abs(), currency)} over target'
               : percentLabel,
+          style: AppTextStyles.caption.copyWith(
+            color: isOver ? AppColors.overBudget : AppColors.secondaryText,
+          ),
+        ),
+        const SizedBox(height: 6),
+        // Motivational / state-aware insight line.
+        Text(
+          BudgetInsight.todayInsight(
+            progress: progress,
+            remaining: remaining,
+            currency: currency,
+          ),
           style: AppTextStyles.caption.copyWith(
             color: isOver ? AppColors.overBudget : AppColors.secondaryText,
           ),
@@ -254,6 +268,20 @@ class _MonthView extends StatelessWidget {
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 6),
+        // Actionable monthly insight (daily-rate or motivational).
+        Text(
+          BudgetInsight.monthInsight(
+            progress: progress,
+            remaining: remaining,
+            daysLeft: daysLeft,
+            currency: currency,
+            hasBudget: budget > 0,
+          ),
+          style: AppTextStyles.caption.copyWith(
+            color: isOver ? AppColors.overBudget : AppColors.secondaryText,
+          ),
         ),
       ],
     );
