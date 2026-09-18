@@ -153,8 +153,8 @@ class _TodayView extends StatelessWidget {
         const SizedBox(height: 12),
         const Center(
           child: SizedBox(
-            width: 64,
-            child: Divider(height: 1, color: AppColors.chartBar),
+            width: 70,
+            child: Divider(height: 4, color: AppColors.chartBar),
           ),
         ),
         const SizedBox(height: 10),
