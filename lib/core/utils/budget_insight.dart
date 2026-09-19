@@ -130,7 +130,7 @@ class BudgetInsight {
     final perDayStr = Formatters.money(perDay, currency);
 
     if (pct >= 80) {
-      return "Getting tight 👀 About $perDayStr/day left.";
+      return "Getting tight 👀 ... About $perDayStr/day left.";
     }
 
     if (pct >= 50) {

@@ -8,8 +8,16 @@ import '../../providers/settings_provider.dart';
 import '../main/main_shell.dart';
 import '../setup/setup_screen.dart';
 
-/// Splash: supplied Lottie logo animation + app name, then a fade into
-/// Setup (first launch) or Home.
+/// Splash: Lottie logo animation, then a fade into Setup or Home.
+///
+/// Animation starts only when BOTH conditions are true:
+///   1. First frame has been painted (addPostFrameCallback) — so the user
+///      can actually see it.
+///   2. Lottie has decoded the JSON and set the controller duration (onLoaded).
+///
+/// This eliminates the "animation already finished" bug on slow/loaded phones,
+/// where the Dart isolate runs for several hundred ms before the screen
+/// becomes visible.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -17,14 +25,47 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
   bool _navigated = false;
+
+  // Two gate flags — animation starts only when both are true.
+  bool _firstFramePainted = false;
+  bool _durationSet = false;
 
   @override
   void initState() {
     super.initState();
-    // Hard upper bound in case the animation fails to load.
-    Future.delayed(const Duration(milliseconds: 2200), _navigateNext);
+    _controller = AnimationController(vsync: this);
+
+    // Gate 1: wait until the first frame is actually on screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _firstFramePainted = true;
+      _tryStart();
+    });
+  }
+
+  /// Called by onLoaded once Lottie has decoded the JSON.
+  void _onLottieLoaded(LottieComposition composition) {
+    // Gate 2: duration is now known.
+    _controller.duration = composition.duration;
+    _durationSet = true;
+    _tryStart();
+  }
+
+  /// Starts playback only when both gates are open.
+  void _tryStart() {
+    if (!_firstFramePainted || !_durationSet || !mounted) return;
+
+    // Safety fallback — navigate after 2.5 s even if something goes wrong.
+    Future.delayed(const Duration(milliseconds: 2500), _navigateNext);
+
+    // Play from frame 0 and navigate once finished.
+    _controller.forward().whenComplete(() {
+      Future.delayed(const Duration(milliseconds: 200), _navigateNext);
+    });
   }
 
   void _navigateNext() {
@@ -39,30 +80,23 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Lottie.asset(
-                'assets/animations/logoanimation.json',
-                width: 180,
-                height: 180,
-                repeat: false,
-                onLoaded: (composition) {
-                  // Leave shortly after the animation completes,
-                  // staying in the ~1.5-2s target window.
-                  final duration = composition.duration;
-                  final wait = duration > const Duration(milliseconds: 1900)
-                      ? const Duration(milliseconds: 1900)
-                      : duration + const Duration(milliseconds: 200);
-                  Future.delayed(wait, _navigateNext);
-                },
-              ),
-            ],
+          child: Lottie.asset(
+            'assets/animations/logoanimation.json',
+            controller: _controller,
+            width: 180,
+            height: 180,
+            onLoaded: _onLottieLoaded,
           ),
         ),
       ),
