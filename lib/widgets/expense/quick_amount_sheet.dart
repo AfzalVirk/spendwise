@@ -10,11 +10,15 @@ import '../../providers/settings_provider.dart';
 import '../common/success_overlay.dart';
 
 /// Bottom sheet for lightning-fast quick add: category is already known,
-/// the user only types an amount and saves.
+/// the user only types an amount (and optional note) and saves.
 Future<void> showQuickAmountSheet(BuildContext context, String category) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    backgroundColor: AppColors.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
     builder: (sheetContext) => Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
@@ -34,26 +38,30 @@ class _QuickAmountSheet extends StatefulWidget {
 }
 
 class _QuickAmountSheetState extends State<_QuickAmountSheet> {
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
   String? _error;
 
   @override
   void dispose() {
-    _controller.dispose();
+    _amountController.dispose();
+    _noteController.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
-    final text = _controller.text.trim();
-    final amount = double.tryParse(text.replaceAll(',', ''));
+    final text = _amountController.text.trim().replaceAll(',', '');
+    final amount = double.tryParse(text);
     if (text.isEmpty || amount == null || amount <= 0) {
       setState(() => _error = 'Enter a valid amount greater than zero');
       return;
     }
 
+    final note = _noteController.text.trim();
     await context.read<ExpenseProvider>().addExpense(
           amount: amount,
           category: widget.category,
+          note: note.isEmpty ? null : note,
         );
     if (!mounted) return;
     showSuccessCheck(context);
@@ -71,6 +79,7 @@ class _QuickAmountSheetState extends State<_QuickAmountSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Drag handle
             Center(
               child: Container(
                 width: 36,
@@ -82,6 +91,8 @@ class _QuickAmountSheetState extends State<_QuickAmountSheet> {
               ),
             ),
             const SizedBox(height: 20),
+
+            // Category icon + name
             Row(
               children: [
                 Container(
@@ -102,21 +113,30 @@ class _QuickAmountSheetState extends State<_QuickAmountSheet> {
               ],
             ),
             const SizedBox(height: 20),
+
+            // ── Amount field — same style as AddExpenseScreen ──────────────
+            const Text('Amount', style: AppTextStyles.label),
+            const SizedBox(height: 8),
             TextField(
-              controller: _controller,
+              controller: _amountController,
               autofocus: true,
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[\d.,]')),
               ],
-              style: AppTextStyles.amount,
-              textAlign: TextAlign.center,
+              style: AppTextStyles.largeAmount.copyWith(fontSize: 34),
               decoration: InputDecoration(
                 hintText: '0',
+                hintStyle: AppTextStyles.largeAmount.copyWith(
+                  fontSize: 34,
+                  color: AppColors.tertiaryText,
+                ),
                 prefixText: '$currency ',
-                prefixStyle: AppTextStyles.amount
-                    .copyWith(color: AppColors.secondaryText),
+                prefixStyle: AppTextStyles.largeAmount.copyWith(
+                  fontSize: 34,
+                  color: AppColors.secondaryText,
+                ),
                 errorText: _error,
               ),
               onChanged: (_) {
@@ -124,7 +144,26 @@ class _QuickAmountSheetState extends State<_QuickAmountSheet> {
               },
               onSubmitted: (_) => _save(),
             ),
-            const SizedBox(height: 16),
+
+            const SizedBox(height: 20),
+
+            // ── Note field ────────────────────────────────────────────────
+            const Text('Note (optional)', style: AppTextStyles.label),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _noteController,
+              textCapitalization: TextCapitalization.sentences,
+              maxLength: 100,
+              decoration: const InputDecoration(
+                hintText: 'e.g. Coffee with friends',
+                counterText: '',
+              ),
+              onSubmitted: (_) => _save(),
+            ),
+
+            const SizedBox(height: 20),
+
+            // ── Save button ───────────────────────────────────────────────
             ElevatedButton(
               onPressed: _save,
               child: const Text('Save'),

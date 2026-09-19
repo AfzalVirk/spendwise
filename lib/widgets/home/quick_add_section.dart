@@ -3,24 +3,11 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
-import '../../core/utils/app_page_route.dart';
-import '../../screens/add_expense/add_expense_screen.dart';
 import '../expense/quick_amount_sheet.dart';
 
-/// Quick Add row: Breakfast / Lunch / Dinner open a one-field amount
-/// sheet; Other opens the full Add Expense screen.
+/// Quick Add row: all four categories open the quick-amount bottom sheet.
 class QuickAddSection extends StatelessWidget {
   const QuickAddSection({super.key});
-
-  void _onTap(BuildContext context, String category) {
-    if (category == Categories.other) {
-      Navigator.of(context).push(
-        SlideUpRoute(page: const AddExpenseScreen()),
-      );
-    } else {
-      showQuickAmountSheet(context, category);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +22,7 @@ class QuickAddSection extends StatelessWidget {
               Expanded(
                 child: _QuickAddButton(
                   category: category,
-                  onTap: () => _onTap(context, category),
+                  onTap: () => showQuickAmountSheet(context, category),
                 ),
               ),
               if (category != Categories.quickAdd.last)
