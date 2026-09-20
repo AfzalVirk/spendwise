@@ -59,12 +59,19 @@ class _SplashScreenState extends State<SplashScreen>
   void _tryStart() {
     if (!_firstFramePainted || !_durationSet || !mounted) return;
 
-    // Safety fallback — navigate after 2.5 s even if something goes wrong.
-    Future.delayed(const Duration(milliseconds: 2500), _navigateNext);
+    // Safety fallback — navigate after 3.5 s even if something goes wrong.
+    Future.delayed(const Duration(milliseconds: 3500), _navigateNext);
 
-    // Play from frame 0 and navigate once finished.
-    _controller.forward().whenComplete(() {
-      Future.delayed(const Duration(milliseconds: 200), _navigateNext);
+    // Give Android OS time to finish its window-opening transition animation.
+    // Flutter's first frame renders *before* the app window is actually fully
+    // visible on screen on many Android devices. This delay ensures the user
+    // actually sees the animation from the start.
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (!mounted) return;
+      // Play exactly from frame 0 and navigate once finished.
+      _controller.forward(from: 0.0).whenComplete(() {
+        Future.delayed(const Duration(milliseconds: 200), _navigateNext);
+      });
     });
   }
 
