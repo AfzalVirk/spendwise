@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/app_page_route.dart';
+import '../../widgets/common/confirm_dialog.dart';
 import '../add_expense/add_expense_screen.dart';
 import '../history/history_screen.dart';
 import '../home/home_screen.dart';
@@ -26,38 +28,63 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 240),
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeIn,
-        transitionBuilder: (child, animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 0.02),
-                end: Offset.zero,
-              ).animate(animation),
-              child: child,
-            ),
-          );
-        },
-        child: KeyedSubtree(
-          key: ValueKey(_index),
-          child: switch (_index) {
-            0 => HomeScreen(onViewAll: () => setState(() => _index = 1)),
-            1 => const HistoryScreen(),
-            _ => const SettingsScreen(),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        // Standard Android UX: If not on Home tab, go back to Home first
+        if (_index != 0) {
+          setState(() => _index = 0);
+          return;
+        }
+
+        // On Home tab: confirm exit
+        final shouldExit = await showConfirmDialog(
+          context,
+          title: 'Exit SpendWise?',
+          message: 'Are you sure you want to exit the app?',
+          confirmLabel: 'Yes',
+          cancelLabel: 'No',
+        );
+        
+        if (shouldExit) {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        body: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 240),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeIn,
+          transitionBuilder: (child, animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.02),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              ),
+            );
           },
+          child: KeyedSubtree(
+            key: ValueKey(_index),
+            child: switch (_index) {
+              0 => HomeScreen(onViewAll: () => setState(() => _index = 1)),
+              1 => const HistoryScreen(),
+              _ => const SettingsScreen(),
+            },
+          ),
         ),
-      ),
-      floatingActionButton: _index == 2
-          ? null
-          : _ScaleOnPressFab(onPressed: _openAddExpense),
-      bottomNavigationBar: _BottomNavBar(
-        index: _index,
-        onChanged: (i) => setState(() => _index = i),
+        floatingActionButton: _index == 2
+            ? null
+            : _ScaleOnPressFab(onPressed: _openAddExpense),
+        bottomNavigationBar: _BottomNavBar(
+          index: _index,
+          onChanged: (i) => setState(() => _index = i),
+        ),
       ),
     );
   }
