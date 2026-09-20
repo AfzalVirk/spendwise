@@ -21,6 +21,9 @@ class SettingsProvider extends ChangeNotifier {
   String get currency => _currency;
   bool get setupComplete => _setupComplete;
 
+  /// Returns all stored monthly budgets (used for backup export).
+  Map<String, double> get monthlyBudgets => StorageService.getAllMonthlyBudgets();
+
   /// Returns the monthly budget for the given year/month.
   /// Returns 0 if none has been set for that month.
   double getMonthlyBudget(int year, int month) =>
@@ -71,6 +74,7 @@ class SettingsProvider extends ChangeNotifier {
     required String name,
     required double dailyTarget,
     required String currency,
+    required Map<String, double> monthlyBudgets,
   }) async {
     _name = name;
     _dailyTarget = dailyTarget;
@@ -80,6 +84,7 @@ class SettingsProvider extends ChangeNotifier {
     await StorageService.setDailyTarget(dailyTarget);
     await StorageService.setCurrency(currency);
     await StorageService.setSetupComplete(true);
+    await StorageService.setAllMonthlyBudgets(monthlyBudgets);
     notifyListeners();
   }
 }

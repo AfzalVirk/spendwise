@@ -57,4 +57,22 @@ class StorageService {
   /// Saves the monthly budget specifically for the given year/month.
   static Future<void> setMonthlyBudget(int year, int month, double value) =>
       HiveService.settingsBox.put(_monthlyBudgetKey(year, month), value);
+
+  /// Returns a map of all stored monthly budgets.
+  static Map<String, double> getAllMonthlyBudgets() {
+    final Map<String, double> budgets = {};
+    for (final key in HiveService.settingsBox.keys) {
+      if (key is String && key.startsWith('monthlyBudget_')) {
+        budgets[key] = (HiveService.settingsBox.get(key) as num).toDouble();
+      }
+    }
+    return budgets;
+  }
+
+  /// Sets multiple monthly budgets at once (used for backup restore).
+  static Future<void> setAllMonthlyBudgets(Map<String, double> budgets) async {
+    for (final entry in budgets.entries) {
+      await HiveService.settingsBox.put(entry.key, entry.value);
+    }
+  }
 }

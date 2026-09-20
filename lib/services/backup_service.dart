@@ -15,12 +15,14 @@ class BackupData {
     required this.dailyTarget,
     required this.currency,
     required this.expenses,
+    required this.monthlyBudgets,
   });
 
   final String name;
   final double dailyTarget;
   final String currency;
   final List<Expense> expenses;
+  final Map<String, double> monthlyBudgets;
 }
 
 /// Thrown for any invalid/unreadable backup file. The message is safe to
@@ -43,6 +45,7 @@ class BackupService {
     required double dailyTarget,
     required String currency,
     required List<Expense> expenses,
+    required Map<String, double> monthlyBudgets,
   }) {
     final map = {
       'app': AppConstants.appName,
@@ -52,6 +55,7 @@ class BackupService {
         'name': name,
         'dailyTarget': dailyTarget,
         'currency': currency,
+        'monthlyBudgets': monthlyBudgets,
       },
       'expenses': expenses.map((e) => e.toJson()).toList(),
     };
@@ -65,12 +69,14 @@ class BackupService {
     required double dailyTarget,
     required String currency,
     required List<Expense> expenses,
+    required Map<String, double> monthlyBudgets,
   }) async {
     final json = encodeBackup(
       name: name,
       dailyTarget: dailyTarget,
       currency: currency,
       expenses: expenses,
+      monthlyBudgets: monthlyBudgets,
     );
     final bytes = utf8.encode(json);
     final fileName =
@@ -167,6 +173,12 @@ class BackupService {
       }
     }
 
+    final rawBudgets = settings['monthlyBudgets'] as Map<String, dynamic>? ?? {};
+    final monthlyBudgets = <String, double>{};
+    for (final entry in rawBudgets.entries) {
+      monthlyBudgets[entry.key] = (entry.value as num).toDouble();
+    }
+
     return BackupData(
       name: (settings['name'] as String?) ?? '',
       dailyTarget: (settings['dailyTarget'] as num?)?.toDouble() ??
@@ -174,6 +186,7 @@ class BackupService {
       currency:
           (settings['currency'] as String?) ?? AppConstants.defaultCurrency,
       expenses: expenses,
+      monthlyBudgets: monthlyBudgets,
     );
   }
 }

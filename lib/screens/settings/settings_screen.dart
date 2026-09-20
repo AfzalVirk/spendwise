@@ -138,6 +138,7 @@ class SettingsScreen extends StatelessWidget {
         name: settings.name,
         dailyTarget: settings.dailyTarget,
         currency: settings.currency,
+        monthlyBudgets: settings.monthlyBudgets,
         expenses: expenses.expenses,
       );
       if (!context.mounted) return;
@@ -171,6 +172,7 @@ class SettingsScreen extends StatelessWidget {
         name: backup.name,
         dailyTarget: backup.dailyTarget,
         currency: backup.currency,
+        monthlyBudgets: backup.monthlyBudgets,
       );
       await expenses.replaceAll(backup.expenses);
       if (!context.mounted) return;
