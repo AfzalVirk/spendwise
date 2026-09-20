@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/app_page_route.dart';
 import '../../providers/settings_provider.dart';
+import '../../services/notification_service.dart';
 import '../../widgets/common/fade_slide_in.dart';
 import '../main/main_shell.dart';
 
@@ -34,6 +35,14 @@ class _SetupScreenState extends State<SetupScreen> {
       return;
     }
     await context.read<SettingsProvider>().completeSetup(name);
+    if (!mounted) return;
+
+    // Ask for notification permission once, right after setup.
+    // The system dialog will appear here; we don't gate anything on the result
+    // — if the user denies, reminders simply won't fire.
+    await NotificationService.requestPermission();
+    await NotificationService.scheduleAll();
+
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       FadeSlideUpRoute(page: const MainShell()),
