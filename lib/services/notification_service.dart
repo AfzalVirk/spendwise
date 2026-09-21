@@ -72,7 +72,7 @@ class NotificationService {
     await _schedule(_idLunch, '🍱 Did you add your lunch expense?',
         hour: 14, minute: 30);
     await _schedule(_idDinner, '🍽️ Did you add your dinner expense?',
-        hour: 17, minute: 35);
+        hour: 20, minute: 30);
     await _schedule(_idSummary, '📝 Have you added all of today\'s expenses?',
         hour: 21, minute: 45);
   }

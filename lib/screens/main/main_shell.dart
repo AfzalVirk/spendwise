@@ -9,6 +9,7 @@ import '../add_expense/add_expense_screen.dart';
 import '../history/history_screen.dart';
 import '../home/home_screen.dart';
 import '../settings/settings_screen.dart';
+import '../stats/stats_screen.dart';
 
 /// Root shell: Home | History | Settings bottom navigation + the
 /// primary "+" FAB that opens Add Expense.
@@ -74,11 +75,12 @@ class _MainShellState extends State<MainShell> {
             child: switch (_index) {
               0 => HomeScreen(onViewAll: () => setState(() => _index = 1)),
               1 => const HistoryScreen(),
+              2 => const StatsScreen(),
               _ => const SettingsScreen(),
             },
           ),
         ),
-        floatingActionButton: _index == 2
+        floatingActionButton: _index == 3
             ? null
             : _ScaleOnPressFab(onPressed: _openAddExpense),
         bottomNavigationBar: _BottomNavBar(
@@ -134,6 +136,11 @@ class _BottomNavBar extends StatelessWidget {
       icon: Icons.receipt_long_outlined,
       activeIcon: Icons.receipt_long_rounded,
       label: 'History'
+    ),
+    (
+      icon: Icons.bar_chart_outlined,
+      activeIcon: Icons.bar_chart_rounded,
+      label: 'Stats'
     ),
     (
       icon: Icons.settings_outlined,
