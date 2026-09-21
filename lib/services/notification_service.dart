@@ -35,7 +35,9 @@ class NotificationService {
     try {
       final localTz = await FlutterTimezone.getLocalTimezone();
       // localTz could be a String or TimezoneInfo depending on the package version
-      final tzName = (localTz is String) ? localTz : (localTz as dynamic).name ?? localTz.toString();
+      final tzName = (localTz is String)
+          ? localTz
+          : (localTz as dynamic).identifier ?? localTz.toString();
       tz.setLocalLocation(tz.getLocation(tzName));
     } catch (_) {
       // Fallback: UTC. Notifications will still fire, just at wrong local time
@@ -70,7 +72,7 @@ class NotificationService {
     await _schedule(_idLunch, '🍱 Did you add your lunch expense?',
         hour: 14, minute: 30);
     await _schedule(_idDinner, '🍽️ Did you add your dinner expense?',
-        hour: 20, minute: 30);
+        hour: 17, minute: 35);
     await _schedule(_idSummary, '📝 Have you added all of today\'s expenses?',
         hour: 21, minute: 45);
   }
