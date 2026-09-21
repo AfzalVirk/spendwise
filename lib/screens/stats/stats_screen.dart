@@ -17,7 +17,6 @@ import '../../widgets/stats/stats_data.dart';
 ///     └── StatsContent         ← lib/widgets/stats/stats_content.dart
 ///           ├── StatsRow
 ///           ├── StatsSectionLabel
-///           ├── StatsBudgetMessage
 ///           └── StatsEmptyMonth
 ///
 /// Data:

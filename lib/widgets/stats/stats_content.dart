@@ -119,12 +119,6 @@ class StatsContent extends StatelessWidget {
             ],
           ),
         ),
-
-        // ── Budget message ───────────────────────────────────────────
-        if (stats.monthlyBudget > 0) ...[
-          const SizedBox(height: 16),
-          StatsBudgetMessage(stats: stats, currency: currency),
-        ],
       ],
     );
   }
@@ -184,65 +178,6 @@ class StatsRow extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
               textAlign: TextAlign.right,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ──────────────────────────────────────────────────────── Budget banner ──────
-
-/// A pill banner that shows whether the user was under or over budget.
-class StatsBudgetMessage extends StatelessWidget {
-  const StatsBudgetMessage({
-    super.key,
-    required this.stats,
-    required this.currency,
-  });
-
-  final StatsData stats;
-  final String currency;
-
-  @override
-  Widget build(BuildContext context) {
-    final isOver = stats.isOverMonthlyBudget;
-    final amount = Formatters.money(stats.saved.abs(), currency);
-    final message = isOver
-        ? 'You went $amount over budget.'
-        : 'You stayed $amount under budget. 🎉';
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: isOver
-            ? AppColors.overBudget.withValues(alpha: 0.06)
-            : AppColors.subtleFill,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isOver
-              ? AppColors.overBudget.withValues(alpha: 0.18)
-              : AppColors.border,
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            isOver
-                ? Icons.info_outline_rounded
-                : Icons.check_circle_outline_rounded,
-            size: 18,
-            color: isOver ? AppColors.overBudget : AppColors.primaryText,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              message,
-              style: AppTextStyles.bodySecondary.copyWith(
-                color: isOver ? AppColors.overBudget : AppColors.primaryText,
-                fontWeight: FontWeight.w500,
-              ),
             ),
           ),
         ],
