@@ -83,7 +83,7 @@ class _MainShellState extends State<MainShell> {
         // ── Bottom app bar ────────────────────────────────────────────
         bottomNavigationBar: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
+            padding: const EdgeInsets.only(left: 18, right: 18, bottom: 10),
             child: _FloatingNavBar(
               index: _index,
               onChanged: (i) => setState(() => _index = i),
@@ -135,7 +135,7 @@ class _FloatingNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 64,
+      height: 66,
       decoration: BoxDecoration(
         color: AppColors.darkFill,
         borderRadius: BorderRadius.circular(32),
