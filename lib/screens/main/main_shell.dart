@@ -11,8 +11,8 @@ import '../home/home_screen.dart';
 import '../settings/settings_screen.dart';
 import '../stats/stats_screen.dart';
 
-/// Root shell: Home | History | Settings bottom navigation + the
-/// primary "+" FAB that opens Add Expense.
+/// Root shell: Home | History | [Add] | Stats | Settings
+/// Nav bar is a floating pill.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -34,13 +34,13 @@ class _MainShellState extends State<MainShell> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
 
-        // Standard Android UX: If not on Home tab, go back to Home first
+        // Standard Android UX: if not on Home tab, go back to Home first.
         if (_index != 0) {
           setState(() => _index = 0);
           return;
         }
 
-        // On Home tab: confirm exit
+        // On Home tab: confirm exit.
         final shouldExit = await showConfirmDialog(
           context,
           title: 'Exit SpendWise?',
@@ -48,12 +48,11 @@ class _MainShellState extends State<MainShell> {
           confirmLabel: 'Yes',
           cancelLabel: 'No',
         );
-        
-        if (shouldExit) {
-          SystemNavigator.pop();
-        }
+        if (shouldExit) SystemNavigator.pop();
       },
       child: Scaffold(
+        extendBody: true,
+        backgroundColor: AppColors.background,
         body: AnimatedSwitcher(
           duration: const Duration(milliseconds: 240),
           switchInCurve: Curves.easeOutCubic,
@@ -80,63 +79,47 @@ class _MainShellState extends State<MainShell> {
             },
           ),
         ),
-        floatingActionButton: _index == 3
-            ? null
-            : _ScaleOnPressFab(onPressed: _openAddExpense),
-        bottomNavigationBar: _BottomNavBar(
-          index: _index,
-          onChanged: (i) => setState(() => _index = i),
+
+        // ── Bottom app bar ────────────────────────────────────────────
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
+            child: _FloatingNavBar(
+              index: _index,
+              onChanged: (i) => setState(() => _index = i),
+              onAdd: _openAddExpense,
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
-/// FAB with subtle press/scale feedback.
-class _ScaleOnPressFab extends StatefulWidget {
-  const _ScaleOnPressFab({required this.onPressed});
+// ────────────────────────────────────────────────────────── Floating nav bar ─
 
-  final VoidCallback onPressed;
-
-  @override
-  State<_ScaleOnPressFab> createState() => _ScaleOnPressFabState();
-}
-
-class _ScaleOnPressFabState extends State<_ScaleOnPressFab> {
-  bool _pressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedScale(
-      scale: _pressed ? 0.92 : 1.0,
-      duration: const Duration(milliseconds: 110),
-      child: GestureDetector(
-        onTapDown: (_) => setState(() => _pressed = true),
-        onTapCancel: () => setState(() => _pressed = false),
-        onTapUp: (_) => setState(() => _pressed = false),
-        child: FloatingActionButton(
-          onPressed: widget.onPressed,
-          tooltip: 'Add expense',
-          child: const Icon(Icons.add_rounded, size: 28),
-        ),
-      ),
-    );
-  }
-}
-
-class _BottomNavBar extends StatelessWidget {
-  const _BottomNavBar({required this.index, required this.onChanged});
+class _FloatingNavBar extends StatelessWidget {
+  const _FloatingNavBar({
+    required this.index,
+    required this.onChanged,
+    required this.onAdd,
+  });
 
   final int index;
   final ValueChanged<int> onChanged;
+  final VoidCallback onAdd;
 
-  static const _items = [
+  // Left side: indices 0 & 1  |  Right side: indices 2 & 3
+  static const _left = [
     (icon: Icons.home_outlined, activeIcon: Icons.home_rounded, label: 'Home'),
     (
       icon: Icons.receipt_long_outlined,
       activeIcon: Icons.receipt_long_rounded,
       label: 'History'
     ),
+  ];
+
+  static const _right = [
     (
       icon: Icons.bar_chart_outlined,
       activeIcon: Icons.bar_chart_rounded,
@@ -152,33 +135,53 @@ class _BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(top: BorderSide(color: AppColors.border)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            children: [
-              for (var i = 0; i < _items.length; i++)
-                Expanded(
-                  child: _NavItem(
-                    icon: _items[i].icon,
-                    activeIcon: _items[i].activeIcon,
-                    label: _items[i].label,
-                    selected: i == index,
-                    onTap: () => onChanged(i),
-                  ),
-                ),
-            ],
+      height: 64,
+      decoration: BoxDecoration(
+        color: AppColors.darkFill,
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 8,
+            offset: Offset(0, 4),
           ),
-        ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // ── Left items ────────────────────────────────────────────
+          for (var i = 0; i < _left.length; i++)
+            Expanded(
+              child: _NavItem(
+                icon: _left[i].icon,
+                activeIcon: _left[i].activeIcon,
+                label: _left[i].label,
+                selected: i == index,
+                onTap: () => onChanged(i),
+              ),
+            ),
+
+          // ── Centre Add Button ─────────────────────────────────────
+          _AddExpenseButton(onPressed: onAdd),
+
+          // ── Right items ───────────────────────────────────────────
+          for (var i = 0; i < _right.length; i++)
+            Expanded(
+              child: _NavItem(
+                icon: _right[i].icon,
+                activeIcon: _right[i].activeIcon,
+                label: _right[i].label,
+                selected: (i + 2) == index,
+                onTap: () => onChanged(i + 2),
+              ),
+            ),
+        ],
       ),
     );
   }
 }
+
+// ────────────────────────────────────────────────────────── Nav item ─────────
 
 class _NavItem extends StatelessWidget {
   const _NavItem({
@@ -197,7 +200,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? AppColors.primaryText : AppColors.tertiaryText;
+    final color = selected ? AppColors.onPrimary : AppColors.tertiaryText;
     return Semantics(
       button: true,
       selected: selected,
@@ -226,6 +229,49 @@ class _NavItem extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ───────────────────────────────────────────────────────── Centre add button ─
+
+/// Press-scaling circular button. White background, black "+" icon.
+class _AddExpenseButton extends StatefulWidget {
+  const _AddExpenseButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  State<_AddExpenseButton> createState() => _AddExpenseButtonState();
+}
+
+class _AddExpenseButtonState extends State<_AddExpenseButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedScale(
+      scale: _pressed ? 0.92 : 1.0,
+      duration: const Duration(milliseconds: 110),
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _pressed = true),
+        onTapCancel: () => setState(() => _pressed = false),
+        onTapUp: (_) => setState(() => _pressed = false),
+        onTap: widget.onPressed,
+        child: Container(
+          width: 52,
+          height: 52,
+          decoration: const BoxDecoration(
+            color: AppColors.onPrimary, // white
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.add_rounded,
+            size: 28,
+            color: AppColors.darkFill, // black
+          ),
         ),
       ),
     );

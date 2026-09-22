@@ -58,8 +58,14 @@ class NotificationService {
     final android = _plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     if (android == null) return true;
-    final granted = await android.requestNotificationsPermission();
-    return granted ?? false;
+    
+    final grantedNotifications = await android.requestNotificationsPermission();
+    
+    // On Android 14+ exact alarms are denied by default.
+    // We must request them explicitly for zonedSchedule with exactAllowWhileIdle to work.
+    await android.requestExactAlarmsPermission();
+    
+    return grantedNotifications ?? false;
   }
 
   // ────────────────────────────────────────────────────── schedule / cancel ──
