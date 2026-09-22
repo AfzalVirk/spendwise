@@ -118,14 +118,18 @@ class NotificationService {
       scheduled = scheduled.add(const Duration(days: 1));
     }
 
-    await _plugin.zonedSchedule(
-      id: id,
-      title: 'SpendWise',
-      body: body,
-      scheduledDate: scheduled,
-      notificationDetails: _details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time, // repeat daily
-    );
+    try {
+      await _plugin.zonedSchedule(
+        id: id,
+        title: 'SpendWise',
+        body: body,
+        scheduledDate: scheduled,
+        notificationDetails: _details,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.time, // repeat daily
+      );
+    } catch (_) {
+      // Ignore if scheduling fails (e.g. missing permissions) so it doesn't crash the app on startup.
+    }
   }
 }

@@ -18,7 +18,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
         children: [
           const FadeSlideIn(child: HomeHeader()),
           const SizedBox(height: 24),

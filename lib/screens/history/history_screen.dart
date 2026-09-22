@@ -150,7 +150,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     )
                   : ListView.builder(
                       key: ValueKey('$_filter-$_pickedDate'),
-                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
                       itemCount: rows.length,
                       itemBuilder: (context, index) {
                         final row = rows[index];
@@ -167,8 +167,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           currency: currency,
                           onTap: () => Navigator.of(context).push(
                             SlideUpRoute(
-                              page:
-                                  AddExpenseScreen(existing: row.expense),
+                              page: AddExpenseScreen(existing: row.expense),
                             ),
                           ),
                         );
