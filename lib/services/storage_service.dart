@@ -24,8 +24,9 @@ class StorageService {
         defaultValue: AppConstants.defaultCurrency,
       ) as String;
 
-  static bool get setupComplete => HiveService.settingsBox
-      .get(_keySetupComplete, defaultValue: false) as bool;
+  static bool get setupComplete =>
+      HiveService.settingsBox.get(_keySetupComplete, defaultValue: false)
+          as bool;
 
   static Future<void> setName(String value) =>
       HiveService.settingsBox.put(_keyName, value);
@@ -71,8 +72,13 @@ class StorageService {
 
   /// Sets multiple monthly budgets at once (used for backup restore).
   static Future<void> setAllMonthlyBudgets(Map<String, double> budgets) async {
-    for (final entry in budgets.entries) {
-      await HiveService.settingsBox.put(entry.key, entry.value);
-    }
+    // Remove any existing monthly budgets so nothing is left behind
+    final keysToDelete = HiveService.settingsBox.keys
+        .where((k) => k is String && k.startsWith('monthlyBudget_'))
+        .toList();
+    await HiveService.settingsBox.deleteAll(keysToDelete);
+
+    // Apply the imported ones
+    await HiveService.settingsBox.putAll(budgets);
   }
 }
